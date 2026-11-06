@@ -1,87 +1,95 @@
 # Logo in Motion
 
-**Skill Claude untuk membuat bumper logo — logo reveal, intro, sting, outro, end card — sebagai video, dengan Remotion.**
+**A Claude skill for making logo bumpers as video with Remotion: logo reveals, intros, stings, outros and end cards.**
 
-Dari file logo (PNG/JPG/SVG) ke MP4 / ProRes / WebM transparan dalam 16:9, 9:16, dan 1:1:
+It takes a logo file (PNG/JPG/SVG) and produces MP4, ProRes or transparent WebM in 16:9, 9:16 and 1:1:
 
-1. **Vektor siap gerak** — logo dibangun ulang sebagai geometri paling sederhana yang halus; setiap bagian logo menjadi "aktor" dengan id.
-2. **Koreografi** — gerak diturunkan dari personality brand dan 12 prinsip animasi, bukan dari selera.
-3. **Render deterministik** — setiap frame adalah fungsi murni dari nomor frame; bisa dirender ulang identik.
-4. **QA berbasis bukti** — frame di setiap marker, contact sheet berlabel, dan *Final Frame Contract* (frame terakhir harus identik piksel dengan lockup statis).
-5. **Suara opsional** — cue SFX dipaku ke marker, dengan kompensasi puncak sampel dan offset encoder.
+1. **Motion-ready vector.** The logo is rebuilt as the simplest smooth geometry that still matches the source. Each part of the logo becomes an "actor" with its own id.
+2. **Choreography.** Motion comes from the brand's personality and the 12 principles of animation, not from taste.
+3. **Deterministic rendering.** Every frame is a pure function of the frame number, so any frame re-renders identically.
+4. **Evidence-based QA.** The skill renders frames at every named moment, builds a labelled contact sheet, and checks the *Final Frame Contract*: the last frame must match the static lockup pixel for pixel.
+5. **Optional sound design.** SFX cues are pinned to named moments in the bumper and compensated for sample peak lag and encoder offset.
 
-> English: a Claude skill that turns a logo into a production-ready animated logo bumper with Remotion — vector prep, personality-driven choreography, 7 ready patterns, multi-aspect rendering, frame-based QA and optional sound design.
+## Built-in patterns
 
-## Pola bawaan
-
-| Pola | Ide | Cocok untuk |
+| Pattern | Idea | Good for |
 |---|---|---|
-| `InkDraw` | goresan logo digambar, wordmark disapu | monogram, line mark, brand premium/tenang |
-| `Assemble` | bagian logo terbang melengkung, huruf naik | logo multi-bagian, brand ramah/jenaka |
-| `PopLockup` | benih → pop dengan overshoot → geser ke lockup | ikon kompak, splash default |
-| `Collapse` | cincin selebar layar runtuh menjadi stempel | outro / end card |
-| `Sheen` | blur menjadi tajam + satu sapuan cahaya | brand premium |
-| `Slam` | melayang di depan lensa lalu menghantam | olahraga, game, media |
-| `Converge` | partikel berkumpul menjadi logo | tech, data, AI |
+| `InkDraw` | strokes are drawn on, the wordmark is wiped in | monograms, line marks, premium or calm brands |
+| `Assemble` | parts fly in on arcs, letters rise in a cascade | multi-part marks, friendly or playful brands |
+| `PopLockup` | seed → pop with overshoot → slide into the lockup | compact icons, default splash |
+| `Collapse` | a frame-filling ring collapses into a stamp | outros and end cards |
+| `Sheen` | blur resolves to sharp, then one light sweep | premium brands |
+| `Slam` | hovers in front of the lens, then slams down | sports, gaming, media |
+| `Converge` | particles gather into the logo | tech, data, AI |
 
-Setiap pola tersedia dalam `16x9`, `9x16`, `1x1`, dengan opsi `outro` (`hold | fade | lift | iris`), `seconds`, `showTagline`, `transparent`, `sfx`, `bgm`.
+Every pattern comes in `16x9`, `9x16` and `1x1`. Render options: `outro` (`hold | fade | lift | iris`), `seconds`, `showTagline`, `transparent`, `grain`, `sfx`, `bgm`.
 
-## Instalasi
+## Installation
 
-Butuh **Node.js 18+** dan **Python 3.9+** dengan `pillow` + `numpy`.
+Requires **Node.js 18+** and **Python 3.9+** with `pillow` and `numpy`.
 
 ```bash
-# Claude Code — skill personal
+# Claude Code: personal skill
 git clone https://github.com/adewanggar/logo-in-motion ~/.claude/skills/logo-in-motion
 pip install pillow numpy
 ```
 
-Atau salin folder ini ke `.claude/skills/logo-in-motion` di dalam proyekmu. Untuk Claude.ai,
-zip folder ini lalu unggah lewat pengaturan Skills.
+You can also copy this folder to `.claude/skills/logo-in-motion` inside a project. For Claude.ai, zip the folder and upload it under Settings → Skills.
 
-## Pemakaian
+## Usage
 
-Cukup minta Claude, misalnya:
+Ask Claude, for example:
 
-- "Animasikan logo ini jadi intro YouTube 5 detik" (lampirkan `logo.png`)
-- "Buat bumper logo untuk brand fintech kami, 16:9 dan 9:16, latar transparan"
-- "Bikin outro logo yang energik dengan efek hantaman dan sound effect"
+- "Animate this logo into a 5-second YouTube intro" (attach `logo.png`)
+- "Make a logo bumper for our fintech brand, 16:9 and 9:16, transparent background"
+- "Make an energetic logo outro with an impact hit and sound effects"
 
-Claude akan membaca logo, menulis brief (`bumper_spec.md`), menyiapkan vektor, memilih pola,
-merender, menjalankan QA, lalu menyerahkan video + contact sheet.
+Claude will:
 
-### Menjalankan template secara manual
+1. read the logo,
+2. write a brief (`bumper_spec.md`),
+3. prepare the vector,
+4. pick a pattern,
+5. render and run QA,
+6. hand back the videos with contact sheets.
+
+### Running the template by hand
 
 ```bash
 cp -r template my-bumper && cd my-bumper
 npm install
 python ../scripts/svg_to_parts.py ../logo.svg --out src/logo/parts.ts --copy-to public/logo.svg
-# edit src/brand.ts (nama, tagline, warna, font, personality)
+# edit src/brand.ts (name, tagline, colors, font, personality)
 npm run dev                                    # Remotion Studio
 node scripts/qa.mjs all --aspect 16x9          # QA: marker frames + Final Frame Contract
 npx remotion render src/index.ts PopLockup-16x9 out/PopLockup-16x9.mp4
 ```
 
-## Struktur
+## Structure
 
 ```
-SKILL.md                 alur kerja & aturan inti (dibaca Claude)
+SKILL.md                 workflow and core rules (read by Claude)
 references/              logo-prep · personality · motion-principles · bumper-patterns ·
                          timing-and-format · sound-design · qa-checklist
-template/                proyek Remotion (React + TypeScript)
-  src/brand.ts           satu-satunya sumber warna, font, personality
-  src/logo/parts.ts      logo sebagai daftar aktor (di-generate dari SVG)
-  src/bumpers/*.tsx      7 pola + kosakata move bersama
-  src/lib/               token personality, timeline 20:50:30, helper animasi murni
-  scripts/qa.mjs         render frame QA + Final Frame Contract
+template/                Remotion project (React + TypeScript)
+  src/brand.ts           single source for colors, font, personality
+  src/logo/parts.ts      the logo as a list of actors (generated from the SVG)
+  src/bumpers/*.tsx      7 patterns + a shared move vocabulary
+  src/lib/               personality tokens, 20:50:30 timeline, pure animation helpers
+  scripts/qa.mjs         QA frame renders + Final Frame Contract
 scripts/                 analyze_logo · svg_to_parts · iou_overlay · contact_sheet · audio_peak
 ```
 
-## Lisensi
+The skill's instructions and references are written in Bahasa Indonesia. Code and code comments are in English.
 
-Kode dan dokumen di repositori ini: [MIT](LICENSE).
+## License
 
-Remotion memiliki [lisensinya sendiri](https://github.com/remotion-dev/remotion/blob/main/LICENSE.md):
-gratis untuk individu dan tim kecil; perusahaan di atas ambang tertentu memerlukan lisensi
-perusahaan. Audio yang kamu tambahkan mengikuti lisensi masing-masing — catat di
-`template/public/audio/CREDITS.md`.
+The code and documents in this repository are under the [MIT](LICENSE) license.
+
+Remotion has [its own license](https://github.com/remotion-dev/remotion/blob/main/LICENSE.md). It is free for individuals and small teams; companies above a certain size need a company license. Any audio you add keeps its own license. Record each file in `template/public/audio/CREDITS.md`.
+
+---
+
+## Bahasa Indonesia
+
+Skill Claude untuk membuat bumper logo (intro, outro, sting, end card) sebagai video dengan Remotion. Skill ini mencakup vektorisasi logo yang siap dianimasikan, koreografi berdasarkan personality brand, 7 pola siap pakai dalam 3 rasio, QA berbasis frame, dan desain suara opsional. Instalasi dan pemakaian ada di bagian atas. Instruksi skill (`SKILL.md` dan `references/`) ditulis dalam Bahasa Indonesia.
