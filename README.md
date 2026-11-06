@@ -32,7 +32,7 @@ Butuh **Node.js 18+** dan **Python 3.9+** dengan `pillow` + `numpy`.
 
 ```bash
 # Claude Code — skill personal
-git clone https://github.com/<username>/logo-in-motion ~/.claude/skills/logo-in-motion
+git clone https://github.com/adewanggar/logo-in-motion ~/.claude/skills/logo-in-motion
 pip install pillow numpy
 ```
 
