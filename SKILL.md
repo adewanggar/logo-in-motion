@@ -32,7 +32,8 @@ references/
   sound-design.md            ← kosakata SFX, cue berbasis marker, kompensasi offset, lisensi
   qa-checklist.md            ← QA berbasis bukti + aturan estetika bernomor
 template/                    ← proyek Remotion siap render (salin per proyek)
-scripts/                     ← analyze_logo, svg_to_parts, iou_overlay, contact_sheet, audio_peak
+scripts/                     ← analyze_logo, svg_to_parts, iou_overlay, contact_sheet, audio_peak,
+                                sfx_synth (generate SFX), sfx_freesound (ambil SFX rekaman)
 ```
 
 ## Deliverables
@@ -43,7 +44,7 @@ Untuk setiap bumper, serahkan:
 - `bumper_spec.md` — brief, personality, pola, tabel timeline (frame), marker, daftar SFX, keputusan & trade-off
 - `out/<Pola>-16x9.mp4` (+ `-9x16`, `-1x1` bila diminta) — H.264, 30 fps
 - versi transparan bila diminta (`.mov` ProRes 4444 atau `.webm` VP9)
-- versi dengan dan tanpa audio bila ada musik/SFX
+- versi dengan SFX (default) dan tanpa audio; tambah versi dengan musik bila ada BGM
 - `out/qa/<comp>/contact_sheet.png` + log Final Frame Contract `PASS`
 - `poster.png` — frame hold (untuk thumbnail / end card statis)
 
@@ -124,12 +125,27 @@ id/role — jangan menggambar ulang logo yang sudah benar.
    - Kamera (push-in, shake) hanya di `Stage`, tidak dipalsukan per part.
    - Teks wordmark adalah teks hidup per huruf; posisinya dari `useLockupLayout`.
 
-## Fase 4 — Suara (opsional, setelah gambar dikunci)
+## Fase 4 — Suara (setelah gambar dikunci)
 
 Baca `references/sound-design.md`. Kosakatanya sinematik: **riser → whoosh → impact →
-shimmer**, bukan bunyi game. Setiap cue dipaku ke **marker** bumper (bukan nomor frame
-mentah) di `src/sound.ts`, dengan `peakLag` hasil `scripts/audio_peak.py` dan offset
-output pipeline. Setiap file dicatat sumber + lisensinya di `public/audio/CREDITS.md`.
+shimmer**, bukan bunyi game. Tiga sumber suara, berurutan dari default:
+
+1. **Generate (default)**: `python scripts/sfx_synth.py kit --out <proyek>/public/audio/sfx --ts <proyek>/src/sfxKit.ts`.
+   Hasilnya 13 suara prosedural yang deterministik, tanpa lisensi pihak ketiga, dan `peakLag`
+   setiap file tercatat otomatis. Kit ini sudah ada di template, dan setiap pola sudah punya
+   rencana cue di `src/sound.ts`. Cukup render dengan `--props='{"sfx":true}'`.
+   Bila brand butuh variasi, buat ulang satu suara dengan seed atau durasi lain
+   (`sfx_synth.py one whoosh --duration 0.9 --seed 4`).
+2. **Rekaman Freesound** (bila butuh foley nyata: kertas, logam, kaca):
+   `scripts/sfx_freesound.py search|get` lewat API resmi (`FREESOUND_API_KEY`). Lisensi
+   default hanya CC0; CC BY boleh bila user setuju atribusi. Manifest dan `CREDITS.md` ditulis otomatis.
+3. **File dari user / musik brand**: selalu didahulukan bila diberikan.
+
+Setiap cue dipaku ke **marker** (bukan nomor frame mentah), dengan `peakLag` dan offset output.
+Untuk rekaman, ukur dulu dengan `scripts/audio_peak.py`. Verifikasi setelah render: ekstrak
+audio (`npx remotion ffmpeg -i out/x.mp4 -vn out/x.wav`) dan pastikan hit utama jatuh ≤ 1 frame
+dari marker-nya, tanpa clipping. Jangan pernah mengklaim suara "sudah didengar": yang bisa kamu
+verifikasi hanyalah waktu, puncak, dan selubung energi. Minta user mendengarkan.
 Bila gambar berubah, semua cue dicek ulang.
 
 ## Fase 5 — QA berbasis bukti

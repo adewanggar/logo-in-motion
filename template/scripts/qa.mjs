@@ -69,6 +69,7 @@ async function frames(comp) {
   if (spec === 'markers') {
     list.set(0, 'start');
     for (const [name, f] of Object.entries(markers)) {
+      if (name.startsWith('_')) continue; // per-part sound markers: too many to bracket
       const fr = Math.min(last, Math.max(0, Math.round(f)));
       list.set(fr, name);
       // bracket every moment that is not a still frame: handoffs hide between beats

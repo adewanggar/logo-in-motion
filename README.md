@@ -8,22 +8,46 @@ It takes a logo file (PNG/JPG/SVG) and produces MP4, ProRes or transparent WebM 
 2. **Choreography.** Motion comes from the brand's personality and the 12 principles of animation, not from taste.
 3. **Deterministic rendering.** Every frame is a pure function of the frame number, so any frame re-renders identically.
 4. **Evidence-based QA.** The skill renders frames at every named moment, builds a labelled contact sheet, and checks the *Final Frame Contract*: the last frame must match the static lockup pixel for pixel.
-5. **Optional sound design.** SFX cues are pinned to named moments in the bumper and compensated for sample peak lag and encoder offset.
+5. **Sound effects included.** A procedural generator makes a cinematic SFX kit (whoosh, riser, impact, boom, pop, shimmer…) with no third-party licenses. Every pattern comes with a sound plan pinned to its key moments. Recorded sounds can also be pulled from Freesound.
 
 ## Built-in patterns
 
-| Pattern | Idea | Good for |
-|---|---|---|
-| `InkDraw` | strokes are drawn on, the wordmark is wiped in | monograms, line marks, premium or calm brands |
-| `Assemble` | parts fly in on arcs, letters rise in a cascade | multi-part marks, friendly or playful brands |
-| `PopLockup` | seed → pop with overshoot → slide into the lockup | compact icons, default splash |
-| `Collapse` | a frame-filling ring collapses into a stamp | outros and end cards |
-| `Sheen` | blur resolves to sharp, then one light sweep | premium brands |
-| `Slam` | hovers in front of the lens, then slams down | sports, gaming, media |
-| `Converge` | particles gather into the logo | tech, data, AI |
-| `IconMorph` | a ring of brand icons spins in and morphs smoothly into the logo's parts | radial marks (petals, blades), creative brands |
+The GIFs below are silent previews of the sample logos that ship with the template. The MP4 renders carry sound.
+
+| | |
+|---|---|
+| ![InkDraw](docs/gifs/InkDraw.gif)<br>**`InkDraw`**: strokes are drawn on, the wordmark is wiped in. *Monograms, line marks, premium or calm brands.* | ![Assemble](docs/gifs/Assemble.gif)<br>**`Assemble`**: parts fly in on arcs, letters rise in a cascade. *Multi-part marks, friendly or playful brands.* |
+| ![PopLockup](docs/gifs/PopLockup.gif)<br>**`PopLockup`**: seed → pop with overshoot → slide into the lockup. *Compact icons, default splash.* | ![Collapse](docs/gifs/Collapse.gif)<br>**`Collapse`**: a frame-filling ring collapses into a stamp. *Outros and end cards.* |
+| ![Sheen](docs/gifs/Sheen.gif)<br>**`Sheen`**: blur resolves to sharp, then one light sweep. *Premium brands.* | ![Slam](docs/gifs/Slam.gif)<br>**`Slam`**: hovers in front of the lens, then slams down. *Sports, gaming, media.* |
+| ![Converge](docs/gifs/Converge.gif)<br>**`Converge`**: particles gather into the logo. *Tech, data, AI.* | ![IconMorph](docs/gifs/IconMorph.gif)<br>**`IconMorph`**: a ring of brand icons spins in and morphs smoothly into the logo's parts. *Radial marks (petals, blades), creative brands.* |
 
 Every pattern comes in `16x9`, `9x16` and `1x1`. Render options: `outro` (`hold | fade | lift | iris`), `seconds`, `showTagline`, `transparent`, `grain`, `sfx`, `bgm`.
+
+## Sound effects
+
+```bash
+# 1. Generate the kit: procedural, deterministic, no third-party license (already included in the template)
+python scripts/sfx_synth.py kit --out template/public/audio/sfx --ts template/src/sfxKit.ts
+
+# 2. Render with sound: each pattern's cues live in template/src/sound.ts
+npx remotion render src/index.ts IconMorph-16x9 out/IconMorph-16x9.mp4 --props='{"sfx":true}'
+
+# Optional: recorded sounds from Freesound (free API key: https://freesound.org/apiv2/apply)
+export FREESOUND_API_KEY=...
+python scripts/sfx_freesound.py search "paper slide" --max-duration 1
+python scripts/sfx_freesound.py get 12345 --out-dir my-bumper/public/audio/sfx
+```
+
+| Sound | Use |
+|---|---|
+| `whoosh`, `whoosh-b`, `whoosh-long` | travelling parts, spins, camera moves |
+| `riser` | build-up that peaks exactly on the landing |
+| `impact`, `impact-soft`, `boom` | the logo landing; `boom` for slams |
+| `pop`, `pop-b`, `tick` | small parts, icons, letters |
+| `shimmer`, `swell` | afterglow on the finished lockup; soft bloom for premium brands |
+| `stroke` | draw-on |
+
+The peak of every cue lands on its marker. The generated table records each file's peak offset, and the encoder's audio delay is compensated. Runs of repeated sounds alternate between two samples and step down in volume, so they never sound like a machine gun.
 
 ## Installation
 
@@ -80,7 +104,11 @@ template/                Remotion project (React + TypeScript)
   src/logo/icons.ts      source icons for IconMorph
   src/lib/               personality tokens, 20:50:30 timeline, pure animation helpers
   scripts/qa.mjs         QA frame renders + Final Frame Contract
-scripts/                 analyze_logo · svg_to_parts · iou_overlay · contact_sheet · audio_peak
+  src/sound.ts           sound plan per pattern (cues pinned to markers)
+  public/audio/sfx/      generated SFX kit (WAV) + sfx-kit.json
+scripts/                 analyze_logo · svg_to_parts · iou_overlay · contact_sheet · audio_peak ·
+                         sfx_synth (generate SFX) · sfx_freesound (source recorded SFX)
+docs/gifs/               README previews
 ```
 
 The skill's instructions and references are written in Bahasa Indonesia. Code and code comments are in English.
@@ -95,4 +123,4 @@ Remotion has [its own license](https://github.com/remotion-dev/remotion/blob/mai
 
 ## Bahasa Indonesia
 
-Skill Claude untuk membuat bumper logo (intro, outro, sting, end card) sebagai video dengan Remotion. Skill ini mencakup vektorisasi logo yang siap dianimasikan, koreografi berdasarkan personality brand, 8 pola siap pakai dalam 3 rasio (termasuk IconMorph: ikon brand yang berubah menjadi bagian logo), QA berbasis frame, dan desain suara opsional. Instalasi dan pemakaian ada di bagian atas. Instruksi skill (`SKILL.md` dan `references/`) ditulis dalam Bahasa Indonesia.
+Skill Claude untuk membuat bumper logo (intro, outro, sting, end card) sebagai video dengan Remotion. Skill ini mencakup vektorisasi logo yang siap dianimasikan, koreografi berdasarkan personality brand, generator sound effect, 8 pola siap pakai dalam 3 rasio (termasuk IconMorph: ikon brand yang berubah menjadi bagian logo), QA berbasis frame, dan desain suara opsional. Instalasi dan pemakaian ada di bagian atas. Instruksi skill (`SKILL.md` dan `references/`) ditulis dalam Bahasa Indonesia.

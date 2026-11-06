@@ -30,7 +30,9 @@ export type Cue = {
 /** Measured per render pipeline (Remotion version + codec + sample rate + container). */
 export const OUTPUT_AUDIO_OFFSET_F = 1.28;
 
-export const cueFrom = (c: Cue) => Math.max(0, Math.round(c.at - (c.peakLag ?? 0) - OUTPUT_AUDIO_OFFSET_F));
+/** Ideal start frame (may be negative when a long build-up must peak early in the bumper). */
+export const cueStart = (c: Cue) => Math.round(c.at - (c.peakLag ?? 0) - OUTPUT_AUDIO_OFFSET_F);
+export const cueFrom = (c: Cue) => Math.max(0, cueStart(c));
 
 export const SoundTrack: React.FC<{
   cues: Cue[];
@@ -56,11 +58,16 @@ export const SoundTrack: React.FC<{
         />
       ) : null}
       {enableSfx
-        ? cues.map((c, i) => (
-            <Sequence key={`${c.src}-${i}`} from={cueFrom(c)} durationInFrames={c.durationInFrames} layout="none">
-              <Html5Audio src={staticFile(c.src)} volume={c.volume} />
-            </Sequence>
-          ))
+        ? cues.map((c, i) => {
+            // A cue that would start before frame 0 is trimmed at its head instead of
+            // shifted late, so its PEAK still lands on the marker.
+            const head = Math.max(0, -cueStart(c));
+            return (
+              <Sequence key={`${c.src}-${i}`} from={cueFrom(c)} durationInFrames={c.durationInFrames} layout="none">
+                <Html5Audio src={staticFile(c.src)} volume={c.volume} trimBefore={head || undefined} />
+              </Sequence>
+            );
+          })
         : null}
     </>
   );

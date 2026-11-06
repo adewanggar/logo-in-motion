@@ -1,0 +1,111 @@
+{
+  "generator": "scripts/sfx_synth.py",
+  "sample_rate": 48000,
+  "license": "generated, no third-party material",
+  "sounds": {
+    "whoosh": {
+      "file": "whoosh.wav",
+      "duration_s": 0.6,
+      "duration_frames": 18.0,
+      "peak_s": 0.325,
+      "peakLag_frames": 9.75,
+      "sample_peak_dbfs": -1.0
+    },
+    "whoosh-b": {
+      "file": "whoosh-b.wav",
+      "duration_s": 0.55,
+      "duration_frames": 16.5,
+      "peak_s": 0.275,
+      "peakLag_frames": 8.25,
+      "sample_peak_dbfs": -1.0
+    },
+    "whoosh-long": {
+      "file": "whoosh-long.wav",
+      "duration_s": 1.4,
+      "duration_frames": 42.0,
+      "peak_s": 1.005,
+      "peakLag_frames": 30.15,
+      "sample_peak_dbfs": -1.0
+    },
+    "riser": {
+      "file": "riser.wav",
+      "duration_s": 1.2,
+      "duration_frames": 36.0,
+      "peak_s": 1.165,
+      "peakLag_frames": 34.95,
+      "sample_peak_dbfs": -1.0
+    },
+    "impact": {
+      "file": "impact.wav",
+      "duration_s": 0.9,
+      "duration_frames": 27.0,
+      "peak_s": 0.015,
+      "peakLag_frames": 0.45,
+      "sample_peak_dbfs": -1.0
+    },
+    "impact-soft": {
+      "file": "impact-soft.wav",
+      "duration_s": 0.7,
+      "duration_frames": 21.0,
+      "peak_s": 0.015,
+      "peakLag_frames": 0.45,
+      "sample_peak_dbfs": -1.0
+    },
+    "boom": {
+      "file": "boom.wav",
+      "duration_s": 1.6,
+      "duration_frames": 48.0,
+      "peak_s": 0.025,
+      "peakLag_frames": 0.75,
+      "sample_peak_dbfs": -1.0
+    },
+    "pop": {
+      "file": "pop.wav",
+      "duration_s": 0.14,
+      "duration_frames": 4.2,
+      "peak_s": 0.005,
+      "peakLag_frames": 0.15,
+      "sample_peak_dbfs": -1.0
+    },
+    "pop-b": {
+      "file": "pop-b.wav",
+      "duration_s": 0.14,
+      "duration_frames": 4.2,
+      "peak_s": 0.005,
+      "peakLag_frames": 0.15,
+      "sample_peak_dbfs": -1.0
+    },
+    "tick": {
+      "file": "tick.wav",
+      "duration_s": 0.05,
+      "duration_frames": 1.5,
+      "peak_s": 0.005,
+      "peakLag_frames": 0.15,
+      "sample_peak_dbfs": -1.0
+    },
+    "shimmer": {
+      "file": "shimmer.wav",
+      "duration_s": 1.6,
+      "duration_frames": 48.0,
+      "peak_s": 0.205,
+      "peakLag_frames": 6.15,
+      "sample_peak_dbfs": -1.0
+    },
+    "swell": {
+      "file": "swell.wav",
+      "duration_s": 2.0,
+      "duration_frames": 60.0,
+      "peak_s": 1.075,
+      "peakLag_frames": 32.25,
+      "sample_peak_dbfs": -1.0
+    },
+    "stroke": {
+      "file": "stroke.wav",
+      "duration_s": 1.4,
+      "duration_frames": 42.0,
+      "peak_s": 0.875,
+      "peakLag_frames": 26.25,
+      "sample_peak_dbfs": -1.0
+    }
+  }
+}

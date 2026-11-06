@@ -4,6 +4,8 @@ import {partOffset, sortedParts} from '../components/LogoMark';
 import {SoundTrack} from '../components/SoundTrack';
 import {Stage} from '../components/Stage';
 import {LOGO} from '../logo/parts';
+import {BRAND} from '../brand';
+import {PERSONALITY} from '../lib/tokens';
 import {keys, prog, tween} from '../lib/anim';
 import {at, len, type Timeline} from '../lib/timeline';
 import {cuesFor} from '../sound';
@@ -23,7 +25,19 @@ const W = {
   tag: [0.8, 1] as const,
 };
 
+/** Landing frame of each part (same math as the component) — one SFX per part. */
+const partLandings = (tl: Timeline) => {
+  const tok = PERSONALITY[BRAND.personality];
+  const R = len(tl.reveal);
+  const n = LOGO.parts.length;
+  const pWin = R * (W.parts[1] - W.parts[0]);
+  const pDur = Math.max(Math.round(tl.fps * tok.partSec), Math.round(pWin * 0.55));
+  const stagger = n > 1 ? (pWin - pDur) / (n - 1) : 0;
+  return Array.from({length: n}, (_, i) => Math.round(at(tl.reveal, W.parts[0]) + i * stagger + pDur * 0.7));
+};
+
 const markers = (tl: Timeline) => ({
+  ...Object.fromEntries(partLandings(tl).map((f, i) => [`_land${i}`, f])),
   firstPart: Math.round(at(tl.reveal, 0.12)),
   lastPartLand: Math.round(at(tl.reveal, W.parts[1])),
   lettersStart: Math.round(at(tl.reveal, W.letters)),

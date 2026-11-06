@@ -4,6 +4,8 @@ import {sortedParts} from '../components/LogoMark';
 import {SoundTrack} from '../components/SoundTrack';
 import {Stage} from '../components/Stage';
 import {ICONS} from '../logo/icons';
+import {BRAND} from '../brand';
+import {PERSONALITY} from '../lib/tokens';
 import {keys, prog, tween} from '../lib/anim';
 import {centroid, lerpPts, matchOrder, outerContour, placeIcon, reorder, resample, toPath, type Pt} from '../lib/morph';
 import {at, len, type Timeline} from '../lib/timeline';
@@ -37,7 +39,20 @@ const W = {
   tag: [0.88, 1] as const,
 };
 
+/** Pop frame of each icon (same math as the component) — one SFX per icon. */
+const iconPops = (tl: Timeline) => {
+  const tok = PERSONALITY[BRAND.personality];
+  const R = len(tl.reveal);
+  const n = sortedParts().filter((p) => p.tag === 'path' && p.attrs.fill !== undefined && p.attrs.fill !== 'none').length;
+  const popDur = Math.max(8, Math.round(tl.fps * tok.partSec));
+  const popWin = R * (W.icons[1] - W.icons[0]) - popDur;
+  return Array.from({length: n}, (_, i) =>
+    Math.round(at(tl.reveal, W.icons[0]) + (n > 1 ? (popWin * i) / (n - 1) : 0) + popDur * 0.6),
+  );
+};
+
 const markers = (tl: Timeline) => ({
+  ...Object.fromEntries(iconPops(tl).map((f, i) => [`_pop${i}`, f])),
   iconsIn: Math.round(at(tl.reveal, W.icons[0])),
   windup: Math.round(at(tl.reveal, W.windup[0])),
   morphStart: Math.round(at(tl.reveal, W.morph[0])),

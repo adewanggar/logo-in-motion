@@ -17,7 +17,8 @@ npx remotion render src/index.ts PopLockup-16x9 out/PopLockup-16x9.mp4
 | `src/bumpers/moves.ts` | shared moves: pop, cascade, slide, shockwave |
 | `src/lib/tokens.ts` | personality → easing / timing tokens |
 | `src/lib/timeline.ts` | lead · 20:50:30 reveal · hold ≥ 1 s · exit |
-| `src/sound.ts` | SFX cues pinned to bumper markers |
+| `src/sound.ts` | sound plan per pattern: SFX cues pinned to bumper markers (`--props='{"sfx":true}'`) |
+| `src/sfxKit.ts` + `public/audio/sfx/` | generated SFX kit (`scripts/sfx_synth.py kit`) with each file's peak offset |
 | `public/audio/CREDITS.md` | source + license of every audio file |
 
 Render props (`--props='{…}'`): `outro` (`hold|fade|lift|iris`), `seconds`, `showTagline`,
