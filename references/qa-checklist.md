@@ -10,7 +10,8 @@ python <skill>/scripts/contact_sheet.py out/qa/PopLockup-16x9
 ```
 
 - `frames markers` merender frame 0, setiap marker, **±2 frame di sekitar setiap marker**
-  (cacat serah terima bersembunyi di antara ketukan yang rata), dan frame terakhir.
+  (cacat serah terima bersembunyi di antara ketukan yang rata), frame terakhir, dan frame `mid`
+  setiap ±10 f di celah > 12 f sebelum hold (gerakannya sendiri harus tertangkap, bukan hanya momennya).
 - `contract` merender frame terakhir (tanpa grain, `outro: hold`) dan `LogoStill` dengan rasio
   sama, lalu membandingkan piksel. Harus `PASS (0 px differ)`.
 - Contact sheet memberi label `f<frame> <marker>` pada setiap tile — periksa dengan mata

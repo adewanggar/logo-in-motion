@@ -9,6 +9,11 @@ import type {PersonalityKey} from './lib/tokens';
 export type Brand = {
   /** Wordmark text. Rendered as live type, one span per letter. */
   name: string;
+  /**
+   * Optional multi-color wordmark, e.g. [{text:'Hiveo', color:'#161E30'}, {text:'Buzz', color:'#E8641B'}].
+   * The joined text must equal `name`. Unset = whole wordmark in colors.ink.
+   */
+  nameParts?: {text: string; color: string}[];
   /** Optional line under the lockup. Empty string = no tagline. */
   tagline: string;
   colors: {

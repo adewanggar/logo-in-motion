@@ -41,6 +41,22 @@ Pakai anak tangga terendah yang lolos QA:
   ukur lebar sepanjang normal, lalu offset kedua tepi dan snap ke tepi sumber. Garis tengah
   itu sekaligus menjadi jalur draw-on pada fase animasi.
 
+### Pola yang sering muncul
+
+- **Mark simetris rotasi** (kincir, bunga, roda, kelopak): jangan menggambar setiap bagian
+  terpisah. Fit **satu unit** (mis. satu jajaran genjang: pusat, titik sudut, dua vektor sisi),
+  lalu putar N kali (360°/N). Optimalkan parameternya terhadap IoU dengan pencarian koordinat
+  sederhana. Hasilnya sedikit parameter, simetri sempurna, dan setiap unit otomatis menjadi aktor.
+- **Celah putih tipis di antara bagian yang bersinggungan**: uji dua hipotesis. (a) Celah itu
+  ruang kosong, sehingga union biasa sudah cukup. (b) Celah itu area **tumpang tindih** yang
+  dikosongkan (gaya even-odd). Untuk (b), potong irisan dengan tetangga dari setiap part sebagai
+  subpath `fill-rule="evenodd"`. Overlay iterasi pertama langsung menunjukkan mana yang benar:
+  bila semua residual kuning (vektor berlebih) tepat di celah, hipotesisnya (b).
+- **Wordmark multi-warna** (mis. "Hiveo" gelap + "Buzz" oranye): tetap teks hidup; warnai per
+  segmen lewat `brand.nameParts`, jangan dijadikan path.
+- **Sumber terlalu kecil** (< ~300 px tinggi): bentuk huruf dan sudut tidak bisa diverifikasi.
+  Minta file lebih besar / SVG / nama font, atau lanjutkan dan ungkapkan keterbatasannya.
+
 ## 3. Gerbang kehalusan (wajib, mengalahkan IoU)
 
 Vektor **gagal** bila tepi yang seharusnya halus:

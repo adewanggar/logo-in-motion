@@ -10,13 +10,14 @@ import {DEF as Collapse} from './bumpers/Collapse';
 import {DEF as Sheen} from './bumpers/Sheen';
 import {DEF as Slam} from './bumpers/Slam';
 import {DEF as Converge} from './bumpers/Converge';
+import {DEF as IconMorph} from './bumpers/IconMorph';
 import {Lockup, useLockupLayout} from './components/Lockup';
 import {LogoMark} from './components/LogoMark';
 import {Stage} from './components/Stage';
 import {makeTimeline} from './lib/timeline';
 import {LOGO} from './logo/parts';
 
-export const BUMPERS: BumperDef[] = [InkDraw, Assemble, PopLockup, Collapse, Sheen, Slam, Converge];
+export const BUMPERS: BumperDef[] = [InkDraw, Assemble, PopLockup, Collapse, Sheen, Slam, Converge, IconMorph];
 
 export const FPS = 30;
 export const ASPECTS = {

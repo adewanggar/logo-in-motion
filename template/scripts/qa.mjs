@@ -10,7 +10,7 @@
  * labelled contact sheet with:  python <skill>/scripts/contact_sheet.py out/qa/<comp>
  */
 import {bundle} from '@remotion/bundler';
-import {renderStill, selectComposition, getCompositions} from '@remotion/renderer';
+import {renderStill, selectComposition, getCompositions, openBrowser} from '@remotion/renderer';
 import fs from 'node:fs';
 import path from 'node:path';
 import zlib from 'node:zlib';
@@ -33,6 +33,19 @@ const scale = Number(opt('scale', '1'));
 
 console.log('bundling…');
 const serveUrl = await bundle({entryPoint: entry});
+// ONE browser for the whole run. Launching a browser per still leaves a Chrome
+// profile in the OS temp dir for every frame (it filled a disk in testing).
+const browser = await openBrowser('chrome');
+// The bundle lives in the OS temp dir (~20–100 MB each run). Remove it on exit.
+process.on('exit', () => {
+  try {
+    fs.rmSync(serveUrl, {recursive: true, force: true});
+  } catch {}
+});
+const done = async (code) => {
+  await browser.close({silent: true}).catch(() => {});
+  process.exit(code);
+};
 
 const outDir = (comp) => {
   const d = path.join(root, 'out', 'qa', comp);
@@ -41,13 +54,13 @@ const outDir = (comp) => {
 };
 
 const still = async (id, frame, props, file, s = scale) => {
-  const composition = await selectComposition({serveUrl, id, inputProps: props});
-  await renderStill({composition, serveUrl, frame, output: file, inputProps: props, imageFormat: 'png', scale: s, overwrite: true});
+  const composition = await selectComposition({serveUrl, id, inputProps: props, puppeteerInstance: browser});
+  await renderStill({composition, serveUrl, frame, output: file, inputProps: props, imageFormat: 'png', scale: s, overwrite: true, puppeteerInstance: browser});
   return composition;
 };
 
 async function frames(comp) {
-  const composition = await selectComposition({serveUrl, id: comp, inputProps: extraProps});
+  const composition = await selectComposition({serveUrl, id: comp, inputProps: extraProps, puppeteerInstance: browser});
   const markers = composition.props._markers ?? {};
   const last = composition.durationInFrames - 1;
   const spec = opt('frames', 'markers');
@@ -67,6 +80,19 @@ async function frames(comp) {
       }
     }
     list.set(last, 'end');
+    // Fill long gaps: a stretch of >12 frames with no sample hides the motion itself.
+    const keysSorted = [...list.keys()].sort((a, b) => a - b);
+    for (let k = 0; k < keysSorted.length - 1; k++) {
+      const a = keysSorted[k], b = keysSorted[k + 1];
+      const inHold = markers.holdStart !== undefined && a >= markers.holdStart;
+      if (b - a > 12 && !inHold) {
+        const n = Math.floor((b - a) / 10);
+        for (let j = 1; j <= n; j++) {
+          const f = Math.round(a + ((b - a) * j) / (n + 1));
+          if (!list.has(f)) list.set(f, 'mid');
+        }
+      }
+    }
   } else {
     for (const f of spec.split(',').map(Number)) list.set(f, `f${f}`);
   }
@@ -138,7 +164,7 @@ async function contract(comp) {
   const props = {...extraProps, grain: false, outro: 'hold'};
   const aspect = comp.split('-').pop();
   const dir = outDir(comp);
-  const composition = await selectComposition({serveUrl, id: comp, inputProps: props});
+  const composition = await selectComposition({serveUrl, id: comp, inputProps: props, puppeteerInstance: browser});
   const last = composition.durationInFrames - 1;
   const a = path.join(dir, 'contract_final.png');
   const b = path.join(dir, 'contract_still.png');
@@ -157,14 +183,17 @@ async function contract(comp) {
   return ok;
 }
 
-if (cmd === 'frames') await frames(opt('comp'));
+if (cmd === 'frames') {
+  await frames(opt('comp'));
+  await done(0);
+}
 if (cmd === 'contract') {
   const ok = await contract(opt('comp'));
-  process.exit(ok ? 0 : 2);
+  await done(ok ? 0 : 2);
 }
 if (cmd === 'all') {
   const aspect = opt('aspect', '16x9');
-  const comps = (await getCompositions(serveUrl, {inputProps: extraProps}))
+  const comps = (await getCompositions(serveUrl, {inputProps: extraProps, puppeteerInstance: browser}))
     .map((c) => c.id)
     .filter((id) => id.endsWith(`-${aspect}`) && !id.startsWith('LogoStill'));
   let fails = 0;
@@ -173,5 +202,5 @@ if (cmd === 'all') {
     if (!(await contract(c))) fails++;
   }
   console.log(fails ? `${fails} bumper(s) FAIL the Final Frame Contract` : 'all bumpers PASS the Final Frame Contract');
-  process.exit(fails ? 2 : 0);
+  await done(fails ? 2 : 0);
 }

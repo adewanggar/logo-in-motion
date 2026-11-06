@@ -1,6 +1,6 @@
 # Katalog Pola Bumper
 
-Tujuh pola siap pakai ada di `template/src/bumpers/`. Setiap pola: satu ide utama,
+Delapan pola siap pakai ada di `template/src/bumpers/`. Setiap pola: satu ide utama,
 marker bernama (untuk SFX & QA), dan kembali ke identitas sebelum hold. Angka frame di
 bawah untuk durasi default @30 fps; semua jendela ditulis sebagai **fraksi dari rentang
 reveal** sehingga otomatis menyesuaikan saat `seconds` diubah.
@@ -38,7 +38,7 @@ Titik awal stroke yang terlihat sebagai noda di frame pertama gambar → pindahk
 
 | Jendela | Isi |
 |---|---|
-| 0.00–0.55 | part datang dari arah luar (vektor pusat-logo → pusat-part), lengkung tegak lurus, rotasi ±14° → 0, blur gerak, urut `order` |
+| 0.00–0.55 | part datang dari arah luar (vektor pusat-logo → pusat-part) sejauh ±2× lebar mark, lengkung tegak lurus, rotasi −18° → 0 **searah untuk semua part** (mark radial berputar masuk seperti kincir), blur gerak, urut `order` |
 | 0.50 | huruf naik (0.55 em) + rotasi 4° → 0, cascade dibatasi 0,7 dtk |
 | 0.80–1.00 | tagline |
 
@@ -124,6 +124,37 @@ Marker: `streamStart, streamMid, condensed, lettersStart, tagIn, holdStart, end`
 Suara: tekstur granular/whoosh berbutir yang makin rapat → impact lembut di `condensed`.
 **Jebakan**: partikel harus mati saat tiba (hold harus bersih). Ukuran partikel diskalakan dengan resolusi.
 
+## 8. IconMorph — ikon brand berputar dan berubah menjadi bagian logo
+**Untuk**: mark yang tersusun dari beberapa bagian serupa mengelilingi pusat (kelopak, bilah,
+segmen) — cerita "apa yang kami kerjakan menjadi siapa kami". **Personality**: playful, friendly, energetic.
+Contoh nyata: HiveoBuzz (agency kreatif) — play, sparkle, chat, lampu, pensil, hati → 6 kelopak.
+
+| Jendela | Isi |
+|---|---|
+| 0.00–0.24 | ikon (`src/logo/icons.ts`) pop satu per satu di cincin yang lebih lebar (1.35× radius), **tegak**, mark diperbesar 1.7× agar ikon terbaca |
+| 0.24–0.34 | antisipasi: cincin berputar mundur +12° |
+| 0.34–0.64 | cincin berputar 120° pulang (kurva narrative) sambil zoom 1.7 → 1 |
+| 0.37–0.64 | **morph** setiap ikon → bagiannya; ikon dijaga tegak di layar sampai morph mengambil alih orientasi |
+| 0.64–0.72 | overshoot −4° → 0; serah terima ke part asli |
+| 0.70–0.86 | mark bergeser ke slot lockup; huruf mulai 0.80 |
+
+Marker: `iconsIn, windup, morphStart, land, shiftStart, lettersStart, tagIn, holdStart, end`.
+Suara: pop kecil per ikon (dua sampel bergantian, volume menurun) → whoosh panjang selama putaran → impact lembut di `land` → shimmer.
+
+**Cara kerja morph** (`src/lib/morph.ts`): kedua bentuk di-resample menjadi 160 titik sepanjang
+keliling (target poligon memakai distribusi per-sisi agar sudutnya tetap tajam), arah putaran
+(winding) disamakan, lalu titik awal ikon digeser secara siklis ke posisi yang meminimalkan
+total perpindahan — dihitung pada **pose awal di layar**. Setelah itu morph = lerp per titik.
+
+**Syarat & jebakan**:
+- Part harus `<path>` **berisi** (fill); stroke/primitif hanya fade in saat serah terima.
+- Ikon: satu kontur tertutup **tanpa lubang**, kotak 100×100, tegak. Detail disampaikan lewat siluet.
+- Morph hanya kontur luar. Lubang/takik part asli muncul saat serah terima: part asli dinyalakan
+  penuh **di bawah** lapisan morph, lalu lapisan morph memudar di atasnya — bila keduanya
+  di-crossfade bersamaan, logo tampak pudar sesaat (ditemukan saat tes).
+- Ikon terlalu kecil bila mark tidak di-zoom: tanpa zoom 1.7× ikon hanya ±50 px di 1080p.
+- Pilih ikon yang relevan dengan brand; jumlah ikon dipakai bergiliran bila part lebih banyak.
+
 ---
 
 ## Resep tambahan (belum jadi komponen — tulis sebagai pola baru bila cocok)
@@ -138,8 +169,9 @@ akhir; jeda napas 10–14 f tanpa segmen baru; lalu 2–3 segmen kunci, dan semu
 + satu lonjakan cahaya. Hanya untuk kata yang dikenali penonton (nama produk). Segmen yang
 belum menyala jangan dirender (bukan opacity 0).
 
-**Morph dari primitif** — lingkaran/persegi menjadi mark. Hanya bila path punya struktur perintah
-yang identik (keuntungan geometri minimal). Tahan primitif sedikit lebih lama (25 : 50 : 25).
+**Morph dari primitif** — lingkaran/persegi menjadi mark. Pakai utilitas `lib/morph.ts` yang sama
+(resample + matchOrder + lerp); struktur perintah path tidak perlu identik. Tahan primitif sedikit
+lebih lama (25 : 50 : 25).
 
 **Split draw-on (garis berpotongan sendiri)** — goresan lebar yang menyeberangi dirinya sendiri
 memunculkan cabang lain terlalu dini. Potong *fill* menjadi beberapa bagian di antara lintasan
@@ -166,6 +198,9 @@ satu aksen berdenyut. Frame 100% harus sama dengan 0%.
 5. Ekspor `markers(tl)` — setiap momen yang layak diberi suara atau diperiksa.
 6. Daftarkan `DEF` di `BUMPERS` dalam `src/Root.tsx`.
 7. Jalankan `node scripts/qa.mjs all` → contract PASS di semua rasio + contact sheet diperiksa.
+
+Morph bentuk apa pun ke bentuk apa pun: `src/lib/morph.ts` (`resample`, `matchOrder`, `reorder`,
+`lerpPts`, `placeIcon`, `toPath`).
 
 Kosakata move tersedia di `src/bumpers/moves.ts`: `pop`, `cascade` (`rise|slide|blur|slam`),
 `slide`, `shockwave`; helper di `src/lib/anim.ts`: `prog`, `tween`, `keys`, `damped`, `lag`,

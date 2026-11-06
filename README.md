@@ -21,6 +21,7 @@ It takes a logo file (PNG/JPG/SVG) and produces MP4, ProRes or transparent WebM 
 | `Sheen` | blur resolves to sharp, then one light sweep | premium brands |
 | `Slam` | hovers in front of the lens, then slams down | sports, gaming, media |
 | `Converge` | particles gather into the logo | tech, data, AI |
+| `IconMorph` | a ring of brand icons spins in and morphs smoothly into the logo's parts | radial marks (petals, blades), creative brands |
 
 Every pattern comes in `16x9`, `9x16` and `1x1`. Render options: `outro` (`hold | fade | lift | iris`), `seconds`, `showTagline`, `transparent`, `grain`, `sfx`, `bgm`.
 
@@ -74,7 +75,9 @@ references/              logo-prep · personality · motion-principles · bumper
 template/                Remotion project (React + TypeScript)
   src/brand.ts           single source for colors, font, personality
   src/logo/parts.ts      the logo as a list of actors (generated from the SVG)
-  src/bumpers/*.tsx      7 patterns + a shared move vocabulary
+  src/bumpers/*.tsx      8 patterns + a shared move vocabulary
+  src/lib/morph.ts       any-shape-to-any-shape morphing (resample, match, lerp)
+  src/logo/icons.ts      source icons for IconMorph
   src/lib/               personality tokens, 20:50:30 timeline, pure animation helpers
   scripts/qa.mjs         QA frame renders + Final Frame Contract
 scripts/                 analyze_logo · svg_to_parts · iou_overlay · contact_sheet · audio_peak
@@ -92,4 +95,4 @@ Remotion has [its own license](https://github.com/remotion-dev/remotion/blob/mai
 
 ## Bahasa Indonesia
 
-Skill Claude untuk membuat bumper logo (intro, outro, sting, end card) sebagai video dengan Remotion. Skill ini mencakup vektorisasi logo yang siap dianimasikan, koreografi berdasarkan personality brand, 7 pola siap pakai dalam 3 rasio, QA berbasis frame, dan desain suara opsional. Instalasi dan pemakaian ada di bagian atas. Instruksi skill (`SKILL.md` dan `references/`) ditulis dalam Bahasa Indonesia.
+Skill Claude untuk membuat bumper logo (intro, outro, sting, end card) sebagai video dengan Remotion. Skill ini mencakup vektorisasi logo yang siap dianimasikan, koreografi berdasarkan personality brand, 8 pola siap pakai dalam 3 rasio (termasuk IconMorph: ikon brand yang berubah menjadi bagian logo), QA berbasis frame, dan desain suara opsional. Instalasi dan pemakaian ada di bagian atas. Instruksi skill (`SKILL.md` dan `references/`) ditulis dalam Bahasa Indonesia.

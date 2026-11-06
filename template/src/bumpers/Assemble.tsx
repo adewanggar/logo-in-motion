@@ -37,7 +37,8 @@ const Assemble: React.FC<BumperProps> = (props) => {
   const parts = sortedParts();
   const R = len(tl.reveal);
   const [, , vbW, vbH] = LOGO.viewBox;
-  const reach = Math.max(vbW, vbH) * 0.55;
+  // Travel distance in viewBox units: ~2 mark-widths reads as a real flight, not a nudge.
+  const reach = Math.max(vbW, vbH) * 2;
 
   // Parts share the parts window; later parts start later (drag hierarchy) and travel less.
   const pWin = R * (W.parts[1] - W.parts[0]);
@@ -64,7 +65,8 @@ const Assemble: React.FC<BumperProps> = (props) => {
       opacity: prog(frame, s, pDur * 0.3),
       tx: ux * dist * travel + -uy * bow * travel,
       ty: uy * dist * travel + ux * bow * travel,
-      rotate: (i % 2 ? -1 : 1) * 14 * travel,
+      // One rotation direction for every part: radial marks swirl in like a pinwheel.
+      rotate: -18 * travel,
       blur: tok.blur * 0.5 * Math.max(0, travel - 0.2),
     };
   };

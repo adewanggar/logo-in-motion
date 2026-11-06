@@ -50,6 +50,7 @@ memang butuh (dan beri komentar alasannya).
 | Mark kompak (ikon, badge, app icon) | Sheen | **PopLockup** | PopLockup | PopLockup | **Slam** |
 | Mark multi-bagian (titik + swoosh + bentuk) | Sheen | Assemble | **Assemble** | **Assemble** | Converge |
 | Wordmark saja | Sheen (mask wipe) | InkDraw (wipe) | Assemble (cascade) | Assemble | Slam (huruf) |
+| Mark radial (kelopak/bilah/segmen) + brand kreatif | Sheen | Assemble | **IconMorph** | **IconMorph** | IconMorph |
 | Brand tech / data / AI / jaringan | Converge (lambat) | **Converge** | Converge | — | Converge |
 | Outro / end card setelah video ramai | Sheen | **Collapse** | Collapse | PopLockup | Collapse |
 

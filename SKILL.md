@@ -27,7 +27,7 @@ references/
   logo-prep.md               ← raster → SVG siap gerak (tangga kompleksitas, gerbang kehalusan, kontrak part)
   personality.md             ← kata brand → token easing/timing + pemilihan pola
   motion-principles.md       ← 12 prinsip animasi khusus bumper logo (dalam frame)
-  bumper-patterns.md         ← katalog 7 pola siap pakai + resep tambahan + cara menulis pola baru
+  bumper-patterns.md         ← katalog 8 pola siap pakai + resep tambahan + cara menulis pola baru
   timing-and-format.md       ← struktur waktu, durasi, rasio, safe area, codec, ekspor alpha
   sound-design.md            ← kosakata SFX, cue berbasis marker, kompensasi offset, lisensi
   qa-checklist.md            ← QA berbasis bukti + aturan estetika bernomor
@@ -55,7 +55,8 @@ Kumpulkan; tanyakan hanya yang tidak bisa disimpulkan dengan aman:
 
 | Input | Default bila tidak disebut |
 |---|---|
-| File logo (SVG lebih baik; PNG/JPG oke) | wajib ada |
+| File logo (SVG lebih baik; PNG/JPG oke, minimal ±300 px tinggi) | wajib ada; bila kecil, minta versi besar mark terpisah |
+| Font brand (file / nama) | tanpa file: pakai font sistem terdekat dan ungkapkan sebagai deviasi |
 | Nama brand + tagline | ambil dari logo; tagline kosong |
 | Kata brand / industri | simpulkan dari bentuk logo (lihat `personality.md`) |
 | Pemakaian: intro channel, outro, iklan, splash | intro 5 detik |
@@ -104,12 +105,14 @@ id/role — jangan menggambar ulang logo yang sudah benar.
 
 ## Fase 3 — Bangun bumper di Remotion
 
-1. Salin `template/` ke folder proyek (mis. `bumper-<brand>/`), lalu `npm install`.
-2. Isi `src/brand.ts`: nama, tagline, warna, font (file font lokal di `public/fonts`
-   agar metrik teks deterministik), personality, orientasi lockup.
+1. Salin `template/` **tanpa** `node_modules/` dan `out/` ke folder proyek (mis. `bumper-<brand>/`), lalu `npm install`.
+2. Isi `src/brand.ts`: nama, `nameParts` bila wordmark multi-warna, tagline, warna (sampel dari
+   area padat sumber, bukan tepi antialias), font (file font lokal di `public/fonts` agar metrik
+   teks deterministik), personality, orientasi lockup. Latar mengikuti dunia brand (mis. artboard
+   krem pada logo sumber), tidak otomatis gelap.
 3. Generate `src/logo/parts.ts` dari SVG (Fase 2).
 4. Pratinjau: `npm run dev` (Remotion Studio). Komposisi tersedia per rasio:
-   `InkDraw | Assemble | PopLockup | Collapse | Sheen | Slam | Converge` × `16x9 | 9x16 | 1x1`,
+   `InkDraw | Assemble | PopLockup | Collapse | Sheen | Slam | Converge | IconMorph` × `16x9 | 9x16 | 1x1`,
    plus `LogoStill-<rasio>` (lockup statis referensi) dan `LogoCheck` (QA geometri).
 5. Sesuaikan pola terpilih, atau tulis pola baru mengikuti "Menulis pola baru" di
    `bumper-patterns.md`. Aturan implementasi:

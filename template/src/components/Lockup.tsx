@@ -62,7 +62,7 @@ export const useLockupLayout = (brand: Brand): LockupLayout => {
       letterSpacing: `${brand.font.tracking}em`,
     });
 
-  let markSize = unit * (orientation === 'mark-only' ? 0.34 : orientation === 'stacked' ? 0.3 : 0.2);
+  let markSize = unit * (orientation === 'mark-only' ? 0.34 : orientation === 'stacked' ? 0.3 : 0.24);
   let fontSize = orientation === 'stacked' ? markSize * 0.42 : orientation === 'wordmark-only' ? unit * 0.16 : markSize * 0.56;
   fontSize = Math.max(fontSize, H * 0.05);
   let gap = markSize * 0.26;
@@ -208,6 +208,11 @@ export const Lockup: React.FC<{
   showTagline?: boolean;
 }> = ({brand, layout: L, mark, word, tag, partStyler, letterStyler, markOverlay, markUnderlay, showTagline = true}) => {
   const n = L.letters.length;
+  // Per-letter base color from brand.nameParts (multi-color wordmarks).
+  const baseColor: string[] = [];
+  if (brand.nameParts?.length) {
+    for (const part of brand.nameParts) for (const _ of Array.from(part.text)) baseColor.push(part.color);
+  }
   return (
     <>
       {L.orientation !== 'wordmark-only' ? (
@@ -251,7 +256,7 @@ export const Lockup: React.FC<{
                   fontWeight: brand.font.weight,
                   fontSize: L.fontSize,
                   letterSpacing: `${brand.font.tracking}em`,
-                  color: s.color ?? brand.colors.ink,
+                  color: s.color ?? baseColor[i] ?? brand.colors.ink,
                   whiteSpace: 'pre',
                   display: 'inline-block',
                   transformOrigin: '50% 80%',
