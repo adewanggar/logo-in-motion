@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- Motion-ready sample mark: one element per actor, stable ids, data-role/data-order for the cascade. -->
+  <path id="orbit" data-role="primary" data-order="0" d="M141.14 50.97 A64 64 0 1 0 141.14 149.03" fill="none" stroke="#F4F1EA" stroke-width="22" stroke-linecap="round"/>
+  <circle id="dot" data-role="accent" data-order="1" cx="166" cy="100" r="15" fill="#FF6A2B"/>
+</svg>
